@@ -1,0 +1,36 @@
+# Render Blueprint
+# Deploy with: render blueprint create
+
+services:
+  # Web Service - Frontend + API
+  - type: web
+    name: aionx
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: aionx
+          envVarKey: RENDER_EXTERNAL_URL
+
+# Disk for SQLite database
+disks:
+  - name: aionx-data
+    mountPath: /app/data
+    sizeGB: 1
+  - name: aionx-uploads
+    mountPath: /app/uploads
+    sizeGB: 1
